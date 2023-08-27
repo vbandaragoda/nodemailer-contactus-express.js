@@ -8,4 +8,5 @@ const getBill = (req, res) => {
 
 module.exports = {
   signup,
+  getBill
 };
