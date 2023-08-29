@@ -1,32 +1,36 @@
 const nodemailer = require("nodemailer");
+const {EMAIL, PASSWORD} = require('../env.js')
 
+// Testing account
 const signup = async (req, res) => {
-  // Testing account
   let testAccount = await nodemailer.createTestAccount();
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.forwardemail.net",
-    port: 465,
-    secure: true,
+  let transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false, // true for 465, false for other ports
     auth: {
-      // TODO: replace `user` and `pass` values from <https://forwardemail.net>
-      user: 'REPLACE-WITH-YOUR-ALIAS@YOURDOMAIN.COM',
-      pass: 'REPLACE-WITH-YOUR-GENERATED-PASSWORD'
-    }
+      user: testAccount.user, // generated ethereal user
+      pass: testAccount.pass, // generated ethereal password
+    },
   });
 
   let message = {
-    from: '"Fred Foo 👻" <foo@example.com>', // sender address
+    from: '"Test Account" <foo@example.com>', // sender address
     to: "bar@example.com, baz@example.com", // list of receivers
-    subject: "Hello ✔", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
+    subject: "Test", // Subject line
+    text: "This is a testing email", // plain text body
+    html: "<b>This is a testing email</b>", // html body
   };
 
   transporter
     .sendMail(message)
-    .then(() => {
-      return res.status(201).json({ msg: "You should receive an email" });
+    .then((info) => {
+      return res.status(201).json({
+        msg: "Email received!",
+        info: info.messageId,
+        preview: nodemailer.getTestMessageUrl(info),
+      });
     })
     .catch((error) => {
       return res.status(500).json({ error });
@@ -35,7 +39,18 @@ const signup = async (req, res) => {
   // res.status(201).json("Signup Succesfully!");
 };
 
+// Gmail account
 const getBill = (req, res) => {
+  let config = {
+    service: "gmail",
+    auth: {
+      user: "",
+      pass: "",
+    },
+  };
+
+  let transporter = nodemailer.createTransport(config);
+
   res.status(201).json("Getbill Succesfully!");
 };
 
